@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 성격 테스트</title>
+<style>
+  /* ============================================
+     1. 색상과 글씨 (여기만 바꾸면 디자인이 바뀝니다)
+     ============================================ */
+  :root {
+    --bg-start: #eef2ff;          /* 배경 그라데이션 시작 */
+    --bg-end:   #f5f3ff;           /* 배경 그라데이션 끝 */
+    --card-color: #ffffff;         /* 카드 배경색 */
+    --main-color: #6366f1;         /* 메인 색 (인디고) */
+    --main-light: #818cf8;         /* 밝은 메인 색 */
+    --accent-color: #ec4899;       /* 포인트 색 (핑크) */
+    --text-color: #1f2937;         /* 글자색 */
+    --sub-text-color: #9ca3af;     /* 부드러운 글자색 */
+    --button-text: #ffffff;        /* 버튼 글자색 */
+    --option-bg: #f9fafb;          /* 선택지 기본 배경 */
+    --option-hover: #f3f4f6;       /* 선택지 마우스 올렸을 때 */
+    --selected-bg: #eef2ff;        /* 선택된 보기 배경 */
+    --border-color: #e5e7eb;       /* 테두리 색 */
+  }
+
+  /* ============================================
+     2. 전체 기본 설정
+     ============================================ */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================
+     3. 카드 (앱 전체를 감싸는 박스)
+     ============================================ */
+  .card {
+    background-color: var(--card-color);
+    width: 100%;
+    max-width: 520px;
+    border-radius: 28px;
+    padding: 36px 28px;
+    box-shadow:
+      0 20px 60px rgba(99, 102, 241, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ============================================
+     4. 헤더 (아이콘 + 제목)
+     ============================================ */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .header-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--main-color), var(--accent-color));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .header-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: white;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--sub-text-color);
+    margin-bottom: 28px;
+    font-size: 15px;
+  }
+
+  /* ============================================
+     5. 진행 표시 (막대 + 숫자)
+     ============================================ */
+  .progress-wrap {
+    margin-bottom: 28px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--option-bg);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--main-color), var(--accent-color));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .progress {
+    text-align: center;
+    color: var(--main-color);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================
+     6. 질문 글씨
+     ============================================ */
+  .question {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.45;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+  }
+
+  /* ============================================
+     7. 선택지 버튼 (아이콘 + 글자)
+     ============================================ */
+  .option-button {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    background-color: var(--option-bg);
+    color: var(--text-color);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .option-button:hover {
+    background-color: var(--option-hover);
+    transform: translateY(-1px);
+  }
+
+  .option-button.selected {
+    background-color: var(--selected-bg);
+    border-color: var(--main-color);
+    color: var(--main-color);
+    font-weight: 600;
+  }
+
+  /* 선택지 앞 동그란 표시 */
+  .option-mark {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .option-button.selected .option-mark {
+    border-color: var(--main-color);
+    background-color: var(--main-color);
+  }
+
+  .option-mark svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+    stroke-width: 3;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .option-button.selected .option-mark svg {
+    opacity: 1;
+  }
+
+  /* ============================================
+     8. 이전 / 다음 버튼
+     ============================================ */
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .nav-button {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .nav-button svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+  }
+
+  .prev-button {
+    background-color: var(--option-bg);
+    color: var(--text-color);
+    flex: 0 0 100px;
+  }
+
+  .prev-button svg {
+    stroke: var(--text-color);
+  }
+
+  .next-button {
+    background: linear-gradient(135deg, var(--main-color), var(--main-light));
+    color: var(--button-text);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  }
+
+  .next-button svg {
+    stroke: white;
+  }
+
+  .nav-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .nav-button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+
+  /* ============================================
+     9. 결과 화면
+     ============================================ */
+  .result-icon-wrap {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, var(--main-color), var(--accent-color));
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.35);
+  }
+
+  .result-icon-wrap svg {
+    width: 56px;
+    height: 56px;
+    stroke: white;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .result-label {
+    text-align: center;
+    color: var(--sub-text-color);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .result-type {
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, var(--main-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .result-desc {
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 28px;
+    padding: 0 8px;
+  }
+
+  .restart-button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--main-color), var(--main-light));
+    color: var(--button-text);
+    border: none;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    transition: all 0.2s;
+  }
+
+  .restart-button svg {
+    width: 18px;
+    height: 18px;
+    stroke: white;
+    stroke-width: 2.5;
+  }
+
+  .restart-button:active {
+    transform: scale(0.97);
+  }
+
+  /* ============================================
+     10. 화면 전환 (질문 / 결과)
+     ============================================ */
+  .hidden {
+    display: none;
+  }
+
+  /* ============================================
+     11. 모바일 화면 (작은 화면) 설정
+     ============================================ */
+  @media (max-width: 480px) {
+    .card {
+      padding: 28px 20px;
+      border-radius: 24px;
+    }
+    h1 {
+      font-size: 22px;
+    }
+    .question {
+      font-size: 19px;
+    }
+    .option-button {
+      font-size: 15px;
+      padding: 14px 16px;
+    }
+    .result-type {
+      font-size: 26px;
+    }
+    .result-icon-wrap {
+      width: 88px;
+      height: 88px;
+    }
+    .result-icon-wrap svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- 질문 화면 -->
+    <div id="quiz-screen">
+
+      <!-- 헤더: 아이콘 + 제목 -->
+      <div class="header">
+        <div class="header-icon">
+          <!-- 반짝이는 별 아이콘 (남녀 모두 무난한 디자인) -->
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3z"/>
+          </svg>
+        </div>
+        <h1>나의 성격 테스트</h1>
+      </div>
+      <p class="subtitle">20개의 질문에 답해 보세요</p>
+
+      <!-- 진행 막대 -->
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 5%;"></div>
+        </div>
+        <div class="progress" id="progress">1 / 20</div>
+      </div>
+
+      <div class="question" id="question">질문이 여기에 표시됩니다.</div>
+
+      <div id="options"></div>
+
+      <div class="nav-buttons">
+        <button class="nav-button prev-button" id="prev-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          이전
+        </button>
+        <button class="nav-button next-button" id="next-btn">
+          <span id="next-label">다음</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="hidden">
+      <div class="result-icon-wrap" id="result-icon-wrap">
+        <!-- 자바스크립트가 여기에 결과별 아이콘을 넣어줍니다 -->
+      </div>
+      <div class="result-label">YOUR TYPE</div>
+      <div class="result-type" id="result-type"></div>
+      <p class="result-desc" id="result-desc"></p>
+      <button class="restart-button" id="restart-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7"/>
+            <path d="M3 4v5h5"/>
+        </svg>
+        다시 하기
+      </button>
+    </div>
+
+  </div>
+
+<script>
+/* ============================================
+   ★ 질문 목록 (여기서 질문을 바꾸거나 추가할 수 있어요)
+
+   - 질문 20개, 각각 4지선다입니다.
+   - 각 선택지는 두 가지 점수를 줍니다:
+     · ei : E(외향) 쪽으로 +면 외향, -면 내향 점수
+     · tf : T(생각) 쪽으로 +면 생각, -면 감정 점수
+   - 숫자가 클수록 그 성향이 더 강하다는 뜻이에요.
+     예) ei: +2  →  외향 성향 강함
+         ei: -1  →  내향 성향 약함
+         ei:  0  →  이 질문은 외향/내향과 관계 없음
+
+   - 한 질문이 두 축 모두에 점수를 줄 수도 있고,
+     한 축에만 점수를 줄 수도 있습니다.
+   ============================================ */
+const questions = [
+  // --- 외향(E) / 내향(I) 관련 질문 ---
+  {
+    text: "쉬는 시간에 가장 끌리는 일은?",
+    options: [
+      { text: "친구들과 모여서 신나게 떠들기",       ei: +2, tf:  0 },
+      { text: "친한 친구 한두 명과 조용히 이야기하기", ei: +1, tf:  0 },
+      { text: "혼자 음악 듣거나 책 읽기",            ei: -1, tf:  0 },
+      { text: "조용한 곳에서 혼자 멍 때리기",         ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "처음 만난 사람과 같이 있을 때 나는?",
+    options: [
+      { text: "먼저 다가가 적극적으로 말을 걸어요",   ei: +2, tf:  0 },
+      { text: "분위기를 보다가 자연스럽게 말을 걸어요", ei: +1, tf:  0 },
+      { text: "상대가 말을 걸어주면 대답해요",        ei: -1, tf:  0 },
+      { text: "최대한 눈을 마주치지 않으려 해요",     ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "여러 명이 모인 자리에서 나는 보통?",
+    options: [
+      { text: "분위기를 이끄는 편이에요",            ei: +2, tf:  0 },
+      { text: "이야기에 잘 끼어서 참여해요",         ei: +1, tf:  0 },
+      { text: "주로 듣는 편이에요",                 ei: -1, tf:  0 },
+      { text: "자리를 빨리 벗어나고 싶어요",        ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "주말에 더 끌리는 일정은?",
+    options: [
+      { text: "친구들과 밖에서 신나게 놀기",         ei: +2, tf:  0 },
+      { text: "친구랑 카페에서 수다 떨기",          ei: +1, tf:  0 },
+      { text: "집에서 좋아하는 것 혼자 하기",        ei: -1, tf:  0 },
+      { text: "하루 종일 방에서 푹 쉬기",           ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "학교에서 발표를 해야 한다면?",
+    options: [
+      { text: "오히려 신나고 자신 있어요",           ei: +2, tf:  0 },
+      { text: "긴장되지만 할 만해요",               ei: +1, tf:  0 },
+      { text: "많이 부담스럽지만 참고 해요",        ei: -1, tf:  0 },
+      { text: "할 수만 있다면 피하고 싶어요",        ei: -2, tf:  0 }
+    ]
+  },
+
+  // --- 생각(T) / 감정(F) 관련 질문 ---
+  {
+    text: "친구가 고민을 털어놓을 때 나는?",
+    options: [
+      { text: "해결 방법을 함께 찾아봐요",           ei:  0, tf: +2 },
+      { text: "상황을 정리해서 조언해줘요",         ei:  0, tf: +1 },
+      { text: "공감하면서 같이 속상해해요",         ei:  0, tf: -1 },
+      { text: "말없이 옆에서 안아줘요",             ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "결정을 내릴 때 더 중요하게 보는 것은?",
+    options: [
+      { text: "객관적인 사실과 자료",               ei:  0, tf: +2 },
+      { text: "논리적으로 따져본 결과",             ei:  0, tf: +1 },
+      { text: "사람들의 기분과 분위기",             ei:  0, tf: -1 },
+      { text: "내 마음이 느끼는 것",                ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "친구와 의견이 다를 때 나는?",
+    options: [
+      { text: "왜 그런지 근거를 들어 설명해요",      ei:  0, tf: +2 },
+      { text: "맞는 쪽으로 차분히 설득해요",        ei:  0, tf: +1 },
+      { text: "친구 마음이 상하지 않게 조심해요",    ei:  0, tf: -1 },
+      { text: "그냥 친구 의견을 따라줘요",          ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "영화를 볼 때 나는 주로?",
+    options: [
+      { text: "이야기 구조나 설정의 허점을 분석해요", ei:  0, tf: +2 },
+      { text: "줄거리가 자연스러운지 생각해요",      ei:  0, tf: +1 },
+      { text: "인물의 감정에 푹 빠져서 봐요",        ei:  0, tf: -1 },
+      { text: "슬픈 장면에서 눈물이 잘 나요",        ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "친구에게 칭찬을 들었을 때 나는?",
+    options: [
+      { text: "정말 잘한 점인지 객관적으로 생각해요", ei:  0, tf: +2 },
+      { text: "고맙다고 말하고 넘어가요",           ei:  0, tf: +1 },
+      { text: "기분이 좋아서 종일 떠올라요",        ei:  0, tf: -1 },
+      { text: "쑥스럽지만 마음이 따뜻해져요",       ei:  0, tf: -2 }
+    ]
+  },
+
+  // --- 두 축이 섞여 있는 질문 ---
+  {
+    text: "조별 과제에서 내가 맡고 싶은 역할은?",
+    options: [
+      { text: "발표 맡고 분위기 이끌기",            ei: +2, tf:  0 },
+      { text: "역할을 나누고 일정을 짜기",          ei: +1, tf: +1 },
+      { text: "팀원들 사이 분위기를 챙기기",        ei:  0, tf: -2 },
+      { text: "자료 조사처럼 혼자 할 수 있는 일",   ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "친구가 약속에 늦었을 때 나는?",
+    options: [
+      { text: "왜 늦었는지 정확히 물어봐요",         ei:  0, tf: +2 },
+      { text: "다음부터는 일찍 오라고 말해요",      ei:  0, tf: +1 },
+      { text: "무슨 일 있었는지 걱정부터 돼요",     ei:  0, tf: -2 },
+      { text: "기다리느라 심심해서 다른 거 해요",   ei: -1, tf:  0 }
+    ]
+  },
+  {
+    text: "새로운 반에 처음 들어갔을 때 나는?",
+    options: [
+      { text: "여기저기 다니며 친구를 사귀어요",     ei: +2, tf:  0 },
+      { text: "옆자리 친구에게 먼저 말 걸어요",     ei: +1, tf:  0 },
+      { text: "분위기를 천천히 살펴봐요",           ei: -1, tf:  0 },
+      { text: "누가 말 걸어줄 때까지 기다려요",     ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "내가 좋아하는 공부 방식은?",
+    options: [
+      { text: "친구들과 모여서 함께 공부",          ei: +2, tf:  0 },
+      { text: "스터디 카페에서 사람들 사이에서",    ei: +1, tf:  0 },
+      { text: "조용한 도서관에서 혼자",             ei: -1, tf:  0 },
+      { text: "내 방에서 완전히 혼자",              ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "친구가 실수해서 속상해할 때 나는?",
+    options: [
+      { text: "다음엔 어떻게 해야 할지 알려줘요",   ei:  0, tf: +2 },
+      { text: "원인이 뭐였는지 같이 생각해봐요",    ei:  0, tf: +1 },
+      { text: "괜찮다고 위로해줘요",                ei:  0, tf: -1 },
+      { text: "친구 기분이 풀릴 때까지 옆에 있어줘요", ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "갈등이 생겼을 때 나는?",
+    options: [
+      { text: "누구 말이 맞는지 따져봐요",          ei:  0, tf: +2 },
+      { text: "규칙이나 기준을 찾아봐요",           ei:  0, tf: +1 },
+      { text: "서로 기분 상하지 않게 중재해요",      ei:  0, tf: -1 },
+      { text: "그냥 내가 양보해버려요",             ei:  0, tf: -2 }
+    ]
+  },
+  {
+    text: "여행을 간다면 더 끌리는 쪽은?",
+    options: [
+      { text: "친구들과 시끌벅적한 단체 여행",       ei: +2, tf:  0 },
+      { text: "친한 친구 한두 명과 함께",           ei: +1, tf:  0 },
+      { text: "가족이랑 조용히",                    ei: -1, tf:  0 },
+      { text: "혼자 떠나는 여행",                   ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "SNS에서 나는 주로?",
+    options: [
+      { text: "내 일상을 자주 올려요",              ei: +2, tf:  0 },
+      { text: "가끔 좋은 일이 있을 때 올려요",      ei: +1, tf:  0 },
+      { text: "거의 안 올리고 구경만 해요",         ei: -1, tf:  0 },
+      { text: "계정은 있지만 잘 안 들어가요",       ei: -2, tf:  0 }
+    ]
+  },
+  {
+    text: "내가 더 자주 듣는 칭찬은?",
+    options: [
+      { text: "똑똑하고 판단이 정확하다",           ei:  0, tf: +2 },
+      { text: "차분하고 믿음직하다",                ei: -1, tf: +1 },
+      { text: "다정하고 잘 챙겨준다",               ei:  0, tf: -2 },
+      { text: "밝고 분위기를 띄운다",               ei: +2, tf:  0 }
+    ]
+  },
+  {
+    text: "에너지가 다 떨어졌을 때 회복하는 방법은?",
+    options: [
+      { text: "친구들 만나서 신나게 놀기",          ei: +2, tf:  0 },
+      { text: "좋아하는 사람과 맛있는 거 먹기",     ei: +1, tf: -1 },
+      { text: "혼자 좋아하는 활동에 몰입하기",      ei: -1, tf:  0 },
+      { text: "아무것도 안 하고 푹 자기",           ei: -2, tf:  0 }
+    ]
+  }
+];
+
+/* ============================================
+   ★ 결과 종류 (여기서 결과 설명과 아이콘을 바꿀 수 있어요)
+   - icon : 결과 화면에 크게 표시되는 SVG 아이콘 코드
+   ============================================ */
+const results = {
+  "ET": {
+    icon: `<svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>`,
+    type: "활발한 리더형",
+    desc: "사람들과 어울리는 걸 좋아하고, 문제를 만나면 빠르게 해결 방법을 찾는 성격이에요. 친구들 사이에서 의견을 모으거나 계획을 세울 때 자연스럽게 앞장서곤 해요."
+  },
+  "EF": {
+    icon: `<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>`,
+    type: "따뜻한 친구형",
+    desc: "친구들과 함께 있을 때 가장 즐겁고, 상대방의 기분을 잘 알아차리는 성격이에요. 분위기를 밝게 만들고 친구들을 응원해 주는 모습이 매력이에요."
+  },
+  "IT": {
+    icon: `<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>`,
+    type: "차분한 탐구형",
+    desc: "혼자 깊이 생각하는 시간을 좋아하고, 궁금한 것이 있으면 끝까지 알아보는 성격이에요. 신중하게 판단하고 정확한 답을 찾는 것에 보람을 느껴요."
+  },
+  "IF": {
+    icon: `<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`,
+    type: "조용한 공감형",
+    desc: "조용한 편이지만 마음이 따뜻하고, 다른 사람의 감정을 잘 헤아리는 성격이에요. 가까운 친구에게는 누구보다 든든한 사람이 되어줄 수 있어요."
+  }
+};
+
+/* ============================================
+   ★ 앱 동작 (이 아래는 가능하면 그대로 두세요)
+   ============================================ */
+
+// 현재 상태를 저장하는 변수
+let currentIndex = 0;          // 지금 보고 있는 질문 번호
+let answers = [];               // 사용자가 고른 답 저장
+
+// 화면에 연결할 요소 가져오기
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const progressEl = document.getElementById("progress");
+const progressFillEl = document.getElementById("progress-fill");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const nextLabel = document.getElementById("next-label");
+const quizScreen = document.getElementById("quiz-screen");
+const resultScreen = document.getElementById("result-screen");
+const restartBtn = document.getElementById("restart-btn");
+
+// 체크 아이콘 SVG (선택된 보기에 표시)
+const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+
+// 질문 보여주기
+function showQuestion() {
+  const q = questions[currentIndex];
+
+  // 진행 상황 표시 (예: 2 / 20)
+  progressEl.textContent = (currentIndex + 1) + " / " + questions.length;
+
+  // 진행 막대 채우기 (퍼센트로 계산)
+  const percent = ((currentIndex + 1) / questions.length) * 100;
+  progressFillEl.style.width = percent + "%";
+
+  // 질문 글 표시
+  questionEl.textContent = q.text;
+
+  // 선택지 버튼 만들기
+  optionsEl.innerHTML = "";
+  q.options.forEach((option, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option-button";
+
+    // 동그란 체크 표시 + 글자
+    btn.innerHTML =
+      '<span class="option-mark">' + CHECK_ICON + '</span>' +
+      '<span>' + option.text + '</span>';
+
+    // 이미 골랐던 답이면 표시해 두기
+    if (answers[currentIndex] === i) {
+      btn.classList.add("selected");
+    }
+
+    // 버튼을 누르면 답 저장
+    btn.onclick = function() {
+      answers[currentIndex] = i;
+      showQuestion(); // 다시 그려서 선택 표시
+    };
+
+    optionsEl.appendChild(btn);
+  });
+
+  // 이전 버튼: 첫 질문이면 누를 수 없음
+  prevBtn.disabled = (currentIndex === 0);
+
+  // 다음 버튼: 답을 안 골랐으면 누를 수 없음
+  nextBtn.disabled = (answers[currentIndex] === undefined);
+
+  // 마지막 질문이면 '결과 보기'로 글자 바꾸기
+  if (currentIndex === questions.length - 1) {
+    nextLabel.textContent = "결과 보기";
+  } else {
+    nextLabel.textContent = "다음";
+  }
+}
+
+// 이전 버튼 동작
+prevBtn.onclick = function() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion();
+  }
+};
+
+// 다음 버튼 동작
+nextBtn.onclick = function() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    showQuestion();
+  } else {
+    showResult(); // 마지막이면 결과 보여주기
+  }
+};
+
+// 결과 계산하고 보여주기
+function showResult() {
+  // 두 가지 점수를 더해 나갑니다.
+  //  - eiScore : 양수(+)면 외향(E), 음수(-)면 내향(I)
+  //  - tfScore : 양수(+)면 생각(T), 음수(-)면 감정(F)
+  let eiScore = 0;
+  let tfScore = 0;
+
+  answers.forEach((answerIndex, qIndex) => {
+    const chosen = questions[qIndex].options[answerIndex];
+    eiScore += chosen.ei;
+    tfScore += chosen.tf;
+  });
+
+  // 점수가 0 이상이면 앞 글자, 0보다 작으면 뒤 글자
+  const ei = (eiScore >= 0) ? "E" : "I";
+  const tf = (tfScore >= 0) ? "T" : "F";
+  const resultKey = ei + tf;
+
+  // 결과 화면에 표시
+  const result = results[resultKey];
+  document.getElementById("result-icon-wrap").innerHTML = result.icon;
+  document.getElementById("result-type").textContent = result.type;
+  document.getElementById("result-desc").textContent = result.desc;
+
+  // 화면 바꾸기
+  quizScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+}
+
+// 다시 하기 버튼 동작
+restartBtn.onclick = function() {
+  currentIndex = 0;
+  answers = [];
+  quizScreen.classList.remove("hidden");
+  resultScreen.classList.add("hidden");
+  showQuestion();
+};
+
+// 앱 처음 시작할 때 첫 질문 보여주기
+showQuestion();
+</script>
+
+</body>
+</html>
