@@ -1,0 +1,853 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>디지털 사용 약속 서약서</title>
+  <style>
+    :root {
+      --ink: #26364b;
+      --muted: #5f6d81;
+      --line: rgba(38, 54, 75, 0.14);
+      --paper: #fffdf8;
+      --mint: #a9ead9;
+      --sky: #a9ddff;
+      --sun: #ffe38c;
+      --pink: #ffc8dc;
+      --green: #78cc8d;
+      --red: #d94b4b;
+      --shadow: 0 20px 45px rgba(76, 108, 130, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(circle at 16% 14%, rgba(255, 227, 140, 0.72), transparent 24%),
+        radial-gradient(circle at 84% 14%, rgba(255, 200, 220, 0.76), transparent 26%),
+        linear-gradient(135deg, #ecfff8 0%, #edf7ff 48%, #fff4e8 100%);
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeUp 0.42s ease both;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .hero {
+      min-height: calc(100vh - 44px);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.7rem, 6.5vw, 5.4rem);
+      line-height: 1.06;
+      letter-spacing: 0;
+      margin-bottom: 16px;
+      word-break: keep-all;
+    }
+
+    h2 {
+      font-size: clamp(1.9rem, 4.2vw, 3rem);
+      line-height: 1.18;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+      word-break: keep-all;
+    }
+
+    h3 {
+      font-size: 1.08rem;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+      line-height: 1.25;
+    }
+
+    .section-title .title-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--sun), var(--pink));
+      box-shadow: inset 0 -4px rgba(196, 112, 39, 0.12);
+      font-size: 1.3rem;
+      flex: 0 0 auto;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: clamp(1.08rem, 2.2vw, 1.34rem);
+      font-weight: 900;
+      line-height: 1.55;
+      max-width: 650px;
+      margin-bottom: 24px;
+    }
+
+    .primary,
+    .secondary,
+    .ghost {
+      border-radius: 18px;
+      padding: 14px 20px;
+      font-weight: 900;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    .primary {
+      color: #213245;
+      background: linear-gradient(135deg, var(--sun), #ffbd72);
+      box-shadow: 0 14px 26px rgba(232, 153, 63, 0.24), inset 0 -4px rgba(196, 112, 39, 0.15);
+    }
+
+    .secondary {
+      color: #213245;
+      background: linear-gradient(135deg, var(--mint), var(--sky));
+      box-shadow: 0 14px 26px rgba(89, 159, 172, 0.2), inset 0 -4px rgba(64, 129, 142, 0.13);
+    }
+
+    .ghost {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .primary:hover,
+    .secondary:hover,
+    .ghost:hover,
+    .promise-card:hover {
+      transform: translateY(-3px);
+      filter: saturate(1.05);
+    }
+
+    .hero-card,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 3vw, 34px);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-card {
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(169, 234, 217, 0.65), rgba(255, 227, 140, 0.64));
+    }
+
+    .hero-icon {
+      font-size: clamp(6rem, 15vw, 10rem);
+      filter: drop-shadow(0 18px 20px rgba(68, 96, 122, 0.18));
+      animation: floaty 3s ease-in-out infinite;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 12px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(76, 108, 130, 0.12);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: inset 0 -4px rgba(255, 168, 75, 0.24);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    input {
+      width: 100%;
+      min-height: 54px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      border: 2px solid rgba(38, 54, 75, 0.12);
+      color: var(--ink);
+      background: #ffffff;
+      font-weight: 900;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(120, 204, 141, 0.68);
+      box-shadow: 0 0 0 4px rgba(120, 204, 141, 0.18);
+    }
+
+    .hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .promise-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .promise-card {
+      min-height: 104px;
+      padding: 16px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 2px solid rgba(38, 54, 75, 0.1);
+      box-shadow: 0 10px 18px rgba(76, 108, 130, 0.08);
+      text-align: left;
+      color: var(--ink);
+      font-weight: 900;
+      line-height: 1.45;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .promise-card.selected {
+      background: #fff7d2;
+      border-color: rgba(255, 174, 71, 0.72);
+    }
+
+    .promise-card small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .warning {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #ffe8e5;
+      color: #8f3b32;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .warning.show {
+      display: block;
+    }
+
+    .certificate-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 720px) 280px;
+      gap: 16px;
+      align-items: start;
+      justify-content: center;
+    }
+
+    .certificate {
+      position: relative;
+      width: min(100%, 720px);
+      aspect-ratio: 210 / 297;
+      min-height: 0;
+      padding: 34px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255, 227, 140, 0.32), transparent 24%),
+        radial-gradient(circle at 82% 16%, rgba(255, 200, 220, 0.28), transparent 22%),
+        linear-gradient(#fffdf8, #fffdf8) padding-box,
+        linear-gradient(135deg, var(--sun), var(--pink), var(--sky)) border-box;
+      border: 8px solid transparent;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .certificate:after {
+      content: "";
+      position: absolute;
+      inset: 22px;
+      border: 2px dashed rgba(38, 54, 75, 0.16);
+      border-radius: 14px;
+      pointer-events: none;
+    }
+
+    .certificate .watermark {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, -50%) rotate(-12deg);
+      color: rgba(38, 54, 75, 0.045);
+      font-size: clamp(7rem, 18vw, 12rem);
+      font-weight: 900;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .corner-mark {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 82px;
+      height: 82px;
+      border-radius: 28px;
+      border: 2px solid rgba(38, 54, 75, 0.09);
+      font-size: 3rem;
+      transform: rotate(-18deg);
+      box-shadow: 0 12px 24px rgba(76, 108, 130, 0.1);
+    }
+
+    .corner-mark.left {
+      right: 42px;
+      bottom: 42px;
+      color: #4f2c8f;
+      background: linear-gradient(135deg, #ffe271, #ffc4d9);
+    }
+
+    .corner-mark.right {
+      left: 42px;
+      top: 38px;
+      color: #2f7a45;
+      background: linear-gradient(135deg, #d8ffe4, #a9ead9);
+      transform: rotate(12deg);
+    }
+
+    .cert-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cert-title {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .cert-title .kicker {
+      display: inline-flex;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: #fff4c7;
+      color: var(--muted);
+      font-weight: 900;
+      margin-bottom: 8px;
+      border: 1px solid rgba(38, 54, 75, 0.1);
+    }
+
+    .cert-title h2 {
+      font-size: clamp(2rem, 4.2vw, 3.15rem);
+      margin-bottom: 0;
+    }
+
+    .cert-text {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.7;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .promise-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 18px 0 24px;
+      padding: 16px;
+      list-style: none;
+      border-radius: 22px;
+      background: rgba(246, 251, 255, 0.72);
+      border: 1px solid rgba(38, 54, 75, 0.1);
+    }
+
+    .promise-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid rgba(38, 54, 75, 0.1);
+      font-weight: 900;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .promise-list li:before {
+      content: "✓";
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #dcffe6;
+      color: #2f7a45;
+      font-weight: 900;
+    }
+
+    .signature-line {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+      margin-top: 22px;
+      font-weight: 900;
+      font-size: 1.25rem;
+    }
+
+    .signature-box {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 248, 216, 0.72);
+      border: 1px solid rgba(38, 54, 75, 0.1);
+    }
+
+    .student-name {
+      min-width: 180px;
+      padding: 0 10px 5px;
+      border-bottom: 3px solid var(--ink);
+      text-align: center;
+      font-size: 1.45rem;
+    }
+
+    .stamp {
+      display: grid;
+      place-items: center;
+      width: 104px;
+      height: 104px;
+      border: 5px solid rgba(217, 75, 75, 0.86);
+      border-radius: 38% 62% 48% 52% / 48% 42% 58% 52%;
+      color: var(--red);
+      font-weight: 900;
+      line-height: 1.12;
+      text-align: center;
+      transform: rotate(-9deg);
+      background: radial-gradient(circle at 35% 30%, #fff7f6, #ffe5e2);
+      box-shadow: 0 8px 18px rgba(217, 75, 75, 0.14), inset 0 0 0 4px rgba(255, 255, 255, 0.75);
+      position: relative;
+    }
+
+    .stamp:before {
+      content: "★";
+      position: absolute;
+      top: 9px;
+      color: rgba(217, 75, 75, 0.72);
+      font-size: 1rem;
+    }
+
+    .date-line {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 900;
+      margin-top: 0;
+    }
+
+    .print-help h2 {
+      font-size: clamp(1.25rem, 2.1vw, 1.55rem);
+      margin-bottom: 8px;
+    }
+
+    .print-help .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .print-help .primary,
+    .print-help .ghost {
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        padding: 12px;
+      }
+
+      .hero,
+      .form-grid,
+      .certificate-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 20px;
+      }
+
+      .hero-card {
+        min-height: 250px;
+      }
+
+      .promise-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .certificate {
+        min-height: auto;
+        padding: 28px 20px;
+      }
+
+      .signature-line {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .print-help .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+
+      body {
+        background: #ffffff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .topbar,
+      .print-actions,
+      #startScreen,
+      #formScreen {
+        display: none !important;
+      }
+
+      .app {
+        width: 100%;
+        padding: 0;
+      }
+
+      #certificateScreen {
+        display: block !important;
+      }
+
+      .certificate-wrap {
+        display: block;
+      }
+
+      .certificate {
+        width: min(100%, 720px);
+        margin: 0 auto;
+        aspect-ratio: 210 / 297;
+        min-height: 0;
+        padding: 34px;
+        border-radius: 20px;
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="screen active" id="startScreen">
+      <div class="hero">
+        <div>
+          <h1>디지털 생활<br />실천 서약서</h1>
+          <p class="lead">디지털 기기를 너무 많이 사용하지 않고, 내가 실천할 수 있는 약속만 골라 나만의 서약서를 만들어 보자.</p>
+          <button class="primary" id="startBtn">서약서 만들기</button>
+        </div>
+        <div class="hero-card" aria-hidden="true">
+          <div>
+            <div class="hero-icon">📝✨</div>
+            <h3>내가 지킬 약속을 직접 고르기</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="formScreen">
+      <header class="topbar">
+        <div class="brand"><span class="badge">📝</span><span>디지털 생활 실천 서약서</span></div>
+        <button class="ghost" id="homeBtn" type="button">처음으로</button>
+      </header>
+
+      <div class="form-grid">
+        <aside class="panel">
+          <label for="studentName">이름</label>
+          <input id="studentName" type="text" maxlength="12" placeholder="이름을 입력하세요" />
+          <p class="hint">서약서 마지막에 이름과 도장이 함께 찍혀요.</p>
+        </aside>
+
+        <section class="panel">
+          <h2 class="section-title"><span class="title-icon">🌱</span><span>실천할 약속을 골라요</span></h2>
+          <p class="hint">내가 올해 꼭 실천하고 싶은 약속을 3가지 이상 골라요.</p>
+          <div class="promise-grid" id="promiseGrid"></div>
+          <div class="warning" id="warning"></div>
+          <div class="actions">
+            <button class="secondary" id="previewBtn">서약서 보기</button>
+            <button class="ghost" id="clearBtn">다시 고르기</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen" id="certificateScreen">
+      <header class="topbar print-actions">
+        <div class="brand"><span class="badge">📄</span><span>완성된 서약서</span></div>
+        <div class="actions" style="margin-top: 0;">
+          <button class="ghost" id="editBtn" type="button">수정하기</button>
+          <button class="primary" id="printBtn" type="button">출력하기</button>
+        </div>
+      </header>
+
+      <div class="certificate-wrap">
+        <article class="certificate">
+          <span class="corner-mark left" aria-hidden="true">✨</span>
+          <span class="corner-mark right" aria-hidden="true">🌱</span>
+          <span class="watermark" aria-hidden="true">PROMISE</span>
+          <div class="cert-inner">
+            <div class="cert-title">
+              <div class="kicker">디지털 생활 실천 약속</div>
+              <h2>디지털 사용 서약서</h2>
+            </div>
+            <p class="cert-text">
+              나는 디지털 기기를 슬기롭게 사용하고,<br />
+              책임감 있는 디지털 시민이 되기 위해 다음 약속을 실천하겠습니다.
+            </p>
+            <ul class="promise-list" id="certificatePromises"></ul>
+            <div class="signature-box">
+              <div class="date-line" id="dateLine"></div>
+              <div class="signature-line">
+                <span>서약자</span>
+                <span class="student-name" id="certificateName">이름</span>
+                <span class="stamp">실천<br />약속</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="panel print-actions print-help">
+          <h2>출력 안내</h2>
+          <p class="hint">`출력하기`를 누르면 인쇄 화면이 열려요. 프린터 대신 PDF로 저장해도 좋아요.</p>
+          <div class="actions">
+            <button class="primary" id="printBtnSide" type="button">출력하기</button>
+            <button class="ghost" id="editBtnSide" type="button">수정하기</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const promises = [
+      {
+        title: "잠들기 30분 전에는 화면을 보지 않기",
+        detail: "잠자기 전에는 눈과 마음을 쉬게 해요."
+      },
+      {
+        title: "숙제나 공부를 먼저 하고 디지털 기기 사용하기",
+        detail: "해야 할 일을 마친 뒤 즐겁게 사용해요."
+      },
+      {
+        title: "정해진 사용 시간이 끝나면 스스로 멈추기",
+        detail: "알람이나 타이머를 사용해도 좋아요."
+      },
+      {
+        title: "식사 시간에는 휴대폰이나 게임기를 내려놓기",
+        detail: "가족, 친구와 대화하는 시간을 지켜요."
+      },
+      {
+        title: "화가 날 때 바로 댓글을 쓰지 않고 잠깐 멈추기",
+        detail: "내 말도 디지털 발자국으로 남을 수 있어요."
+      },
+      {
+        title: "모르는 링크나 광고를 함부로 누르지 않기",
+        detail: "개인정보를 지키는 안전 습관이에요."
+      },
+      {
+        title: "내 사진이나 친구 사진을 올리기 전 허락받기",
+        detail: "나와 친구의 개인정보를 함께 지켜요."
+      },
+      {
+        title: "비밀번호는 친구에게도 알려주지 않기",
+        detail: "비밀번호는 나만 아는 중요한 열쇠예요."
+      },
+      {
+        title: "하루에 한 번은 화면 없이 쉬는 시간 갖기",
+        detail: "산책, 독서, 놀이처럼 다른 활동도 해요."
+      },
+      {
+        title: "재미있는 영상도 계속 보기 전에 한 번 멈춰 생각하기",
+        detail: "추천 영상에 끌려 너무 오래 보지 않도록 해요."
+      }
+    ];
+
+    const selected = new Set();
+    const screens = {
+      start: document.getElementById("startScreen"),
+      form: document.getElementById("formScreen"),
+      certificate: document.getElementById("certificateScreen")
+    };
+
+    const promiseGrid = document.getElementById("promiseGrid");
+    const warning = document.getElementById("warning");
+    const studentName = document.getElementById("studentName");
+    const certificateName = document.getElementById("certificateName");
+    const certificatePromises = document.getElementById("certificatePromises");
+    const dateLine = document.getElementById("dateLine");
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.remove("active"));
+      screens[name].classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderPromises() {
+      promiseGrid.innerHTML = promises.map((promise, index) => `
+        <button class="promise-card ${selected.has(index) ? "selected" : ""}" type="button" data-index="${index}">
+          ${selected.has(index) ? "✅" : "☐"} ${promise.title}
+          <small>${promise.detail}</small>
+        </button>
+      `).join("");
+
+      promiseGrid.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.index);
+          if (selected.has(index)) {
+            selected.delete(index);
+          } else {
+            selected.add(index);
+          }
+          warning.classList.remove("show");
+          renderPromises();
+        });
+      });
+    }
+
+    function showWarning(message) {
+      warning.textContent = message;
+      warning.classList.add("show");
+    }
+
+    function makeCertificate() {
+      const name = studentName.value.trim();
+      if (!name) {
+        showWarning("이름을 먼저 입력해 주세요.");
+        studentName.focus();
+        return;
+      }
+
+      if (selected.size < 3) {
+        showWarning("실천 약속을 3개 이상 골라 주세요.");
+        return;
+      }
+
+      certificateName.textContent = name;
+      certificatePromises.innerHTML = [...selected].map(index => `<li>${promises[index].title}</li>`).join("");
+      const now = new Date();
+      dateLine.textContent = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+      showScreen("certificate");
+    }
+
+    function resetForm() {
+      selected.clear();
+      warning.classList.remove("show");
+      renderPromises();
+    }
+
+    document.getElementById("startBtn").addEventListener("click", () => showScreen("form"));
+    document.getElementById("homeBtn").addEventListener("click", () => showScreen("start"));
+    document.getElementById("previewBtn").addEventListener("click", makeCertificate);
+    document.getElementById("clearBtn").addEventListener("click", resetForm);
+    document.getElementById("editBtn").addEventListener("click", () => showScreen("form"));
+    document.getElementById("editBtnSide").addEventListener("click", () => showScreen("form"));
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+    document.getElementById("printBtnSide").addEventListener("click", () => window.print());
+
+    renderPromises();
+  </script>
+</body>
+</html>
