@@ -1,1 +1,640 @@
 
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG 탐정: AI 답변의 단서 찾기</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --ink: #1d2433;
+      --muted: #667085;
+      --line: #d8deea;
+      --panel: #ffffff;
+      --blue: #2f6fed;
+      --green: #079669;
+      --red: #d9483b;
+      --yellow: #a36900;
+      --soft-blue: #eaf1ff;
+      --soft-green: #e8f7f0;
+      --soft-red: #fff0ee;
+      --soft-yellow: #fff7df;
+      --shadow: 0 14px 34px rgba(29, 36, 51, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fbfcff 0%, var(--bg) 100%);
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    button, textarea { font: inherit; }
+
+    header {
+      padding: 22px clamp(18px, 4vw, 44px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,.86);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+
+    .subtitle { margin: 6px 0 0; font-size: 15px; }
+
+    .score {
+      min-width: 118px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(29, 36, 51, .06);
+    }
+
+    .score strong {
+      display: block;
+      color: var(--blue);
+      font-size: 26px;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 26px clamp(16px, 4vw, 34px) 36px;
+    }
+
+    .progress {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .pill.active {
+      background: var(--soft-blue);
+      border-color: #b9cbff;
+      color: #1f55c7;
+    }
+
+    .screen { display: none; animation: show .2s ease-out; }
+    .screen.active { display: block; }
+
+    @keyframes show {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 30px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .dark-card {
+      background: #142033;
+      color: #fff;
+      border-radius: 8px;
+      padding: clamp(20px, 3vw, 30px);
+      box-shadow: var(--shadow);
+    }
+
+    .dark-card p { color: #d5deef; }
+
+    .big {
+      margin: 18px 0;
+      color: #fff;
+      font-size: clamp(30px, 5vw, 56px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .notice {
+      margin-top: 16px;
+      border: 1px solid #f0d890;
+      background: var(--soft-yellow);
+      color: #624b09;
+      border-radius: 8px;
+      padding: 14px 15px;
+      line-height: 1.6;
+    }
+
+    .creator {
+      margin-top: 8px;
+      color: #8a94a6;
+      line-height: 1.45;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .creator strong {
+      color: #687386;
+      font-weight: 700;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 17px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(47,111,237,.22);
+    }
+
+    .btn.secondary {
+      background: #eef2f8;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .answer-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 17px;
+      display: flex;
+      flex-direction: column;
+      min-height: 520px;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      background: #eef2f8;
+      color: #43516a;
+    }
+
+    .tag.red { background: var(--soft-red); color: var(--red); }
+    .tag.green { background: var(--soft-green); color: var(--green); }
+    .tag.blue { background: var(--soft-blue); color: #1f55c7; }
+    .tag.yellow { background: var(--soft-yellow); color: var(--yellow); }
+
+    .ai-answer {
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.62;
+      margin-bottom: 14px;
+    }
+
+    .source {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      margin-top: 4px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .mini-title {
+      margin: 16px 0 8px;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .choice {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 11px 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .choice.selected {
+      border-color: var(--blue);
+      background: var(--soft-blue);
+      box-shadow: 0 0 0 3px rgba(47,111,237,.12);
+    }
+
+    .choice.correct { border-color: #9bdcc7; background: var(--soft-green); }
+    .choice.wrong { border-color: #ffc0b8; background: var(--soft-red); }
+
+    .feedback {
+      min-height: 30px;
+      margin-top: 12px;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
+    .card-feedback {
+      min-height: 58px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f7f9fc;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .card-feedback.good {
+      background: var(--soft-green);
+      color: #056346;
+    }
+
+    .card-feedback.bad {
+      background: var(--soft-red);
+      color: #9c2f25;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13px;
+      margin-top: 18px;
+    }
+
+    .mini {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 16px;
+    }
+
+    .mini strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 104px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(47,111,237,.12);
+    }
+
+    footer {
+      padding: 0 20px 22px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      header { align-items: flex-start; }
+      .hero, .grid, .cards, .compare, .progress { grid-template-columns: 1fr; }
+      .answer-card { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>RAG 탐정: AI 답변의 단서 찾기</h1>
+      <p class="subtitle">답변을 읽자마자 바로 판단합니다. 출처와 근거가 보이는지 확인해 보세요.</p>
+    </div>
+    <div class="score">탐정 점수<strong id="score">0</strong></div>
+  </header>
+
+  <main>
+    <nav class="progress" aria-label="활동 단계">
+      <div class="pill active">1. 미션</div>
+      <div class="pill">2. 카드별 추리</div>
+      <div class="pill">3. 정리</div>
+    </nav>
+
+    <section class="screen active" id="screen-0">
+      <div class="hero">
+        <div class="panel">
+          <h2>오늘 배울 핵심</h2>
+          <p>RAG는 AI가 답하기 전에 외부 자료를 찾아보고, 그 자료를 바탕으로 답을 만드는 방식입니다.</p>
+          <p>하지만 실제 화면에서는 우리가 내부 과정을 100% 볼 수 없습니다. 그래서 학생들은 답변에 남은 단서를 살펴봐야 합니다.</p>
+          <div class="notice">
+            중요한 구분: <strong>RAG</strong>는 자료를 찾아보고 답하는 내부 과정이고, <strong>출처 표시</strong>는 그 자료를 사용자에게 보여주는 화면 기능입니다.
+          </div>
+          <div class="row">
+            <button class="btn" onclick="go(1)">탐정 활동 시작</button>
+          </div>
+        </div>
+        <div class="dark-card">
+          <p>탐정 질문</p>
+          <div class="big">남극은 사막일까요?</div>
+          <p>세 AI가 같은 질문에 답합니다. 각 답변을 읽고 바로 아래에서 어떤 유형인지 판단해 봅니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-1">
+      <div class="panel">
+        <h2>답변을 읽고 바로 유형을 고르세요</h2>
+        <p>각 카드 안에서 답변, 출처 유무, 근거 문장을 확인한 뒤 바로 선택합니다. 이렇게 해야 방금 본 내용을 기억한 상태에서 판단할 수 있습니다.</p>
+
+        <div class="cards">
+          <article class="answer-card">
+            <span class="tag red">답변 A</span>
+            <h3>AI A</h3>
+            <p class="ai-answer">“아니요. 남극은 얼음으로 덮여 있으므로 사막이 아닙니다. 사막은 보통 덥고 모래가 많은 곳입니다.”</p>
+            <div class="source">
+              <strong>화면에 보이는 출처:</strong><br />
+              없음
+            </div>
+            <div class="mini-title">A는 어떤 답변일까요?</div>
+            <button class="choice" data-q="a" data-answer="memory" onclick="pick(this)">기억 기반 답변</button>
+            <button class="choice" data-q="a" data-answer="maybe" onclick="pick(this)">RAG일 수도 있지만 확인 어려움</button>
+            <button class="choice" data-q="a" data-answer="visible" onclick="pick(this)">출처가 보이는 RAG형 답변</button>
+            <div class="card-feedback" id="feedback-a">힌트: 출처가 없고 흔한 오해를 말하고 있는지 보세요.</div>
+          </article>
+
+          <article class="answer-card">
+            <span class="tag yellow">답변 B</span>
+            <h3>AI B</h3>
+            <p class="ai-answer">“네. 남극은 사막입니다. 사막은 강수량이 매우 적은 지역을 뜻하며, 남극은 매우 건조한 지역입니다.”</p>
+            <div class="source">
+              <strong>화면에 보이는 출처:</strong><br />
+              없음
+            </div>
+            <div class="mini-title">B는 어떤 답변일까요?</div>
+            <button class="choice" data-q="b" data-answer="memory" onclick="pick(this)">기억 기반 답변</button>
+            <button class="choice" data-q="b" data-answer="maybe" onclick="pick(this)">RAG일 수도 있지만 확인 어려움</button>
+            <button class="choice" data-q="b" data-answer="visible" onclick="pick(this)">출처가 보이는 RAG형 답변</button>
+            <div class="card-feedback" id="feedback-b">힌트: 답은 맞아 보이지만, 사용자가 출처를 확인할 수 있나요?</div>
+          </article>
+
+          <article class="answer-card">
+            <span class="tag green">답변 C</span>
+            <h3>AI C</h3>
+            <p class="ai-answer">“네. 남극은 사막입니다. 사막은 기온이 아니라 강수량이 매우 적은 지역을 뜻합니다. 남극은 강수량이 적어 지구에서 가장 큰 사막으로 분류됩니다.”</p>
+            <div class="source">
+              <strong>화면에 보이는 출처:</strong><br />
+              자료 1: 사막의 기준<br />
+              자료 2: 남극의 분류
+            </div>
+            <div class="mini-title">C는 어떤 답변일까요?</div>
+            <button class="choice" data-q="c" data-answer="memory" onclick="pick(this)">기억 기반 답변</button>
+            <button class="choice" data-q="c" data-answer="maybe" onclick="pick(this)">RAG일 수도 있지만 확인 어려움</button>
+            <button class="choice" data-q="c" data-answer="visible" onclick="pick(this)">출처가 보이는 RAG형 답변</button>
+            <div class="card-feedback" id="feedback-c">힌트: 답변과 함께 참고 자료가 보이는지 확인하세요.</div>
+          </article>
+        </div>
+
+        <div class="feedback" id="quiz-feedback"></div>
+        <div class="row">
+          <button class="btn secondary" onclick="go(0)">이전</button>
+          <button class="btn" onclick="checkQuiz()">전체 결과 보기</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-2">
+      <div class="grid">
+        <div class="panel">
+          <h2>정리: RAG와 출처 표시는 다릅니다</h2>
+          <div class="compare">
+            <div class="mini">
+              <span class="tag red">기억 기반</span>
+              <strong>답변 A</strong>
+              출처가 없고, “사막은 덥고 모래가 많다”는 흔한 오해를 바탕으로 말했습니다.
+            </div>
+            <div class="mini">
+              <span class="tag yellow">RAG 가능</span>
+              <strong>답변 B</strong>
+              내용은 맞아 보이지만 출처가 없어서 RAG를 썼는지 사용자가 확인하기 어렵습니다.
+            </div>
+            <div class="mini">
+              <span class="tag green">출처 공개 RAG</span>
+              <strong>답변 C</strong>
+              답변과 함께 참고 자료가 보입니다. 그래서 사용자가 근거를 확인하기 쉽습니다.
+            </div>
+          </div>
+          <div class="notice">
+            학생용 한 문장: RAG는 AI가 책을 펴서 자료를 찾아보고 답하는 방식이고, 출처 표시는 어떤 책을 봤는지 보여주는 기능입니다.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>내 말로 설명하기</h2>
+          <p>빈칸에 들어갈 말을 생각하며 한 문장으로 정리해 보세요.</p>
+          <p><strong>RAG는 AI가 답하기 전에 ________를 찾아보고, 그 내용을 바탕으로 ________을 만드는 방식이다. 하지만 RAG를 써도 ________가 항상 보이는 것은 아니다.</strong></p>
+          <textarea id="note" placeholder="예: RAG는 AI가 자료를 찾아보고 그 자료를 바탕으로 답변을 만드는 방식이다. 하지만 출처가 항상 보이는 것은 아니다."></textarea>
+          <div class="feedback" id="note-feedback"></div>
+          <div class="row">
+            <button class="btn secondary" onclick="go(1)">이전</button>
+            <button class="btn" onclick="finish()">정리 완료</button>
+            <button class="btn secondary" onclick="resetGame()">다시 하기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>수업 질문: “출처가 없으면 무엇을 확인하기 어려울까?” “출처가 있어도 왜 다시 살펴봐야 할까?”</div>
+    <div class="creator">
+      만든 사람: <strong>김현정</strong><br />
+      문의: <strong>hairu94@naver.com</strong>
+    </div>
+  </footer>
+
+  <script>
+    const screens = [...document.querySelectorAll(".screen")];
+    const pills = [...document.querySelectorAll(".pill")];
+    const scoreEl = document.getElementById("score");
+    const correct = { a: "memory", b: "maybe", c: "visible" };
+    const explanations = {
+      a: {
+        good: "맞아요. A는 자료나 출처 없이 흔한 오해를 바탕으로 답한 기억 기반 답변입니다.",
+        bad: "다시 보세요. A는 출처가 없고, 남극이 사막이 아니라는 흔한 오해를 말하고 있습니다."
+      },
+      b: {
+        good: "맞아요. B는 내용은 맞아 보이지만 출처가 없어서 RAG를 썼는지 확인하기 어렵습니다.",
+        bad: "조금 더 생각해 봅시다. B는 맞는 내용처럼 보이지만 출처가 없으므로 내부에서 RAG를 썼다고 단정할 수 없습니다."
+      },
+      c: {
+        good: "맞아요. C는 참고 자료가 함께 보이므로 출처가 보이는 RAG형 답변입니다.",
+        bad: "다시 보세요. C는 답변 아래에 참고 자료가 표시되어 있어 사용자가 근거를 확인할 수 있습니다."
+      }
+    };
+    const chosen = {};
+    const scored = {};
+    let score = 0;
+    let finished = false;
+
+    function go(index) {
+      screens.forEach((screen, i) => screen.classList.toggle("active", i === index));
+      pills.forEach((pill, i) => pill.classList.toggle("active", i === index));
+    }
+
+    function addScore(points) {
+      score += points;
+      scoreEl.textContent = score;
+    }
+
+    function pick(button) {
+      const q = button.dataset.q;
+      const answer = button.dataset.answer;
+      chosen[q] = answer;
+
+      document.querySelectorAll(`[data-q="${q}"]`).forEach(item => {
+        item.classList.remove("selected", "correct", "wrong");
+      });
+
+      const isCorrect = answer === correct[q];
+      button.classList.add("selected", isCorrect ? "correct" : "wrong");
+
+      const feedback = document.getElementById(`feedback-${q}`);
+      feedback.textContent = isCorrect ? explanations[q].good : explanations[q].bad;
+      feedback.classList.toggle("good", isCorrect);
+      feedback.classList.toggle("bad", !isCorrect);
+
+      if (isCorrect && !scored[q]) {
+        scored[q] = true;
+        addScore(20);
+      }
+
+      document.getElementById("quiz-feedback").textContent = "";
+    }
+
+    function checkQuiz() {
+      const feedback = document.getElementById("quiz-feedback");
+      if (!chosen.a || !chosen.b || !chosen.c) {
+        feedback.textContent = "A, B, C를 모두 선택해 주세요. 각 카드 아래에서 바로 고르면 됩니다.";
+        return;
+      }
+
+      const count = Object.keys(correct).filter(key => chosen[key] === correct[key]).length;
+      feedback.textContent = `${count}/3개 맞았습니다. 이제 왜 그렇게 구분하는지 정리해 봅시다.`;
+      setTimeout(() => go(2), 800);
+    }
+
+    function finish() {
+      const note = document.getElementById("note").value.trim();
+      const feedback = document.getElementById("note-feedback");
+      if (note.length < 12) {
+        feedback.textContent = "한 문장으로 조금만 더 써 보세요.";
+        return;
+      }
+      feedback.textContent = "좋습니다. RAG와 출처 표시의 차이를 자기 말로 설명했습니다.";
+      if (!finished) {
+        addScore(20);
+        finished = true;
+      }
+    }
+
+    function resetGame() {
+      score = 0;
+      finished = false;
+      scoreEl.textContent = "0";
+      Object.keys(chosen).forEach(key => delete chosen[key]);
+      Object.keys(scored).forEach(key => delete scored[key]);
+      document.querySelectorAll(".choice").forEach(item => {
+        item.classList.remove("selected", "correct", "wrong");
+      });
+      document.querySelectorAll(".card-feedback").forEach(item => {
+        item.classList.remove("good", "bad");
+      });
+      document.getElementById("feedback-a").textContent = "힌트: 출처가 없고 흔한 오해를 말하고 있는지 보세요.";
+      document.getElementById("feedback-b").textContent = "힌트: 답은 맞아 보이지만, 사용자가 출처를 확인할 수 있나요?";
+      document.getElementById("feedback-c").textContent = "힌트: 답변과 함께 참고 자료가 보이는지 확인하세요.";
+      document.getElementById("quiz-feedback").textContent = "";
+      document.getElementById("note-feedback").textContent = "";
+      document.getElementById("note").value = "";
+      go(0);
+    }
+  </script>
+</body>
+</html>
+
