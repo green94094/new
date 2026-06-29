@@ -176,24 +176,16 @@
     }
 
     .creator {
-      position: fixed;
-      right: 24px;
-      bottom: 22px;
-      z-index: 10;
-      width: min(310px, calc(100vw - 32px));
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .94);
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 14px;
-      box-shadow: 0 12px 28px rgba(29, 36, 51, .12);
-      backdrop-filter: blur(10px);
+      margin-top: 8px;
+      color: #8a94a6;
+      line-height: 1.45;
+      font-size: 12px;
+      text-align: right;
     }
 
     .creator strong {
-      color: var(--ink);
+      color: #687386;
+      font-weight: 700;
     }
 
     .btn {
@@ -375,6 +367,8 @@
 
     footer {
       padding: 0 20px 22px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
       text-align: center;
       color: var(--muted);
       font-size: 13px;
@@ -423,11 +417,6 @@
         </div>
       </div>
     </section>
-
-    <div class="creator">
-      만든 사람: <strong>김현정</strong><br />
-      문의: <strong>hairu94@naver.com</strong>
-    </div>
 
     <section class="screen" id="screen-1">
       <div class="panel">
@@ -532,7 +521,13 @@
     </section>
   </main>
 
-  <footer>수업 질문: “출처가 없으면 무엇을 확인하기 어려울까?” “출처가 있어도 왜 다시 살펴봐야 할까?”</footer>
+  <footer>
+    <div>수업 질문: “출처가 없으면 무엇을 확인하기 어려울까?” “출처가 있어도 왜 다시 살펴봐야 할까?”</div>
+    <div class="creator">
+      만든 사람: <strong>김현정</strong><br />
+      문의: <strong>hairu94@naver.com</strong>
+    </div>
+  </footer>
 
   <script>
     const screens = [...document.querySelectorAll(".screen")];
@@ -642,4 +637,3 @@
   </script>
 </body>
 </html>
-
